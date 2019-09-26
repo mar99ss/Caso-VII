@@ -26,6 +26,7 @@ public class Test {
   private Ranking ranking;
   private ArrayList<String> arrayLetras;
   private ArrayList<String> arrayNumeros; 
+  private static int contador;
   public Test(){ 
   }
   
@@ -41,21 +42,27 @@ public class Test {
   
   public void crearRanking(){
     ranking = new Ranking(); 
-    for (int indice=0;indice<65;indice++){
+    int totalConjuntos=(int)(Math.random()*100);
+    for (int indice=0;indice<18;indice++){
       Conjunto conjunto = new Conjunto(); 
-      for(int letra =0;letra<(Math.random()*26);letra++){
+      int totalLetras=(int)(Math.random()*7)+1;
+      for(int letra =0;letra<totalLetras;letra++){
         int letraAleatorio= (int)(Math.random()*26);
-        conjunto.getCaracteres().add(arrayLetras.get(letraAleatorio));
+    	conjunto.getCaracteres().add(arrayLetras.get(letraAleatorio));
       }
-      
-      for(int numero =0;numero<(Math.random()*10);numero++){
+      Set<String> set = new HashSet<>(conjunto.getCaracteres());
+      conjunto.getCaracteres().clear();
+  	  conjunto.getCaracteres().addAll(set);
+      int totalNumeros=(int)(Math.random()*4)+1;
+      for(int numero =0;numero<totalNumeros;numero++){
         int numeroAleatorio= (int)(Math.random()*10);
-        conjunto.getNumeros().add(arrayNumeros.get(numeroAleatorio));
+    	conjunto.getNumeros().add(arrayNumeros.get(numeroAleatorio));
       }
       
       ranking.getRanking().add(conjunto);
     }
     calcularSucced(); 
+    desecharPosibilidades();
     ranking.getSortedRankingBysucced(); 
   }
   
@@ -63,19 +70,23 @@ public class Test {
     for(int indice=0;indice<ranking.getRanking().size();indice++){
       ArrayList<String> conjuntoLetras= ranking.getRanking().get(indice).getCaracteres();
       ArrayList<String> conjuntoNumeros= ranking.getRanking().get(indice).getNumeros();
+     
       double cantidadSucced=0;
-      for(int letra=0;letra<conjuntoLetras.size();letra++){
-        for(int numero=0;numero<conjuntoNumeros.size();numero++) {
-	    	String secretKey= parte1+conjuntoLetras.get(letra)+parte2+conjuntoNumeros.get(numero)+parte3;
-	        String decryptedString = AES.decrypt(originalString, secretKey) ;
-	        if(decryptedString!=null){
-	            cantidadSucced++;
+      if(conjuntoLetras.size()>0 && conjuntoNumeros.size()>0) {
+	      for(int letra=0;letra<conjuntoLetras.size();letra++){
+	        for(int numero=0;numero<conjuntoNumeros.size();numero++) {
+		    	String secretKey= parte1+conjuntoLetras.get(letra)+parte2+conjuntoNumeros.get(numero)+parte3;
+		        String decryptedString = AES.decrypt(originalString, secretKey) ;
+		        contador++;
+		        if(decryptedString!=null){
+		            cantidadSucced++;
+		        }
 	        }
-        }
+	      }
       }
       
-      ranking.getRanking().get(indice).setSucced(cantidadSucced/
-    		  (Double.valueOf((ranking.getRanking().get(indice).getCaracteres().size()+ranking.getRanking().get(indice).getNumeros().size())))*100);
+      ranking.getRanking().get(indice).setSucced((cantidadSucced/
+    		  (Double.valueOf((ranking.getRanking().get(indice).getCaracteres().size()+ranking.getRanking().get(indice).getNumeros().size()))))*100);
     }
   }
   
@@ -93,30 +104,42 @@ public class Test {
 	    respuesta+=respuestaFinal.getNumeros().get(indice)+"\t";
     }
 	System.out.println(respuesta);
+	System.out.println(contador);
   }
   
   public Conjunto conseguirRespuesta(){
-    ArrayList<Conjunto> arrayFinal = new ArrayList<>();
+    ArrayList<Conjunto> arrayFinal = ranking.getRanking();
     Conjunto conjuntoFin = new Conjunto();
-    for(int indice =0;indice<ranking.getRanking().size();indice++ ){
-      if (ranking.getRanking().get(indice).getSucced()>0.0) {
-    	  arrayFinal.add(ranking.getRanking().get(indice));
-      }
-    }
-    for(int indice=0;indice<arrayFinal.size();indice++) {
-    	if(indice+1<arrayFinal.size()) {
-    		for(int caracter=0;caracter<arrayFinal.get(indice+1).getCaracteres().size();caracter++) {
-    			if(arrayFinal.get(0).getCaracteres().contains(arrayFinal.get(indice+1).getCaracteres().get(caracter))){
-    				conjuntoFin.getCaracteres().add(arrayFinal.get(indice+1).getCaracteres().get(caracter));
-    			}
+    if(arrayFinal.size()!=1&& arrayFinal.size()!=2) {
+	    for(int indice=0;indice<arrayFinal.size();indice++) {
+	    	System.out.println(arrayFinal.get(indice).getCaracteres());
+	    	System.out.println(arrayFinal.get(indice).getNumeros());
+	    	if(indice+1<arrayFinal.size()) {
+	    		//System.out.println(arrayFinal.get(indice).toString());
+	    		for(int contador=indice+1;contador<arrayFinal.size();contador++) {
+	    			for(int caracter=0;caracter<arrayFinal.get(contador).getCaracteres().size();caracter++) {
+		    			
+		    			if(arrayFinal.get(indice).getCaracteres().contains(arrayFinal.get(contador).getCaracteres().get(caracter))){
+		    				conjuntoFin.getCaracteres().add(arrayFinal.get(contador).getCaracteres().get(caracter));
+		    			}
+		    		}
+		    		
+		    		for(int numero=0;numero<arrayFinal.get(contador).getNumeros().size();numero++) {
+						if(arrayFinal.get(indice).getNumeros().contains(arrayFinal.get(contador).getNumeros().get(numero))){
+							conjuntoFin.getNumeros().add(arrayFinal.get(contador).getNumeros().get(numero));
+						}
+		    		}
+		    	}
     		}
-    		
-    		for(int numero=0;numero<arrayFinal.get(indice+1).getNumeros().size();numero++) {
-    			if(arrayFinal.get(0).getNumeros().contains(arrayFinal.get(indice+1).getNumeros().get(numero))){
-    				conjuntoFin.getNumeros().add(arrayFinal.get(indice+1).getNumeros().get(numero));
-    			}
-    		}
-    	}
+	    		
+	    }
+    }else if(arrayFinal.size()==2) {
+    	conjuntoFin.getCaracteres().addAll(arrayFinal.get(0).getCaracteres());
+    	conjuntoFin.getNumeros().addAll(arrayFinal.get(0).getNumeros());
+    	conjuntoFin.getCaracteres().addAll(arrayFinal.get(1).getCaracteres());
+    	conjuntoFin.getNumeros().addAll(arrayFinal.get(1).getNumeros());
+    }else {
+    	conjuntoFin=arrayFinal.get(0);
     }
     if(!conjuntoFin.getCaracteres().isEmpty()&&!conjuntoFin.getNumeros().isEmpty()) {
     	Set<String> set = new HashSet<>(conjuntoFin.getCaracteres());
@@ -128,5 +151,17 @@ public class Test {
     }
     
     return conjuntoFin;
+  }
+  
+  void desecharPosibilidades() {
+	  int indice=0;
+	  while(indice<ranking.getRanking().size()) {
+		  if (ranking.getRanking().get(indice).getSucced()<1.0) {
+	    	  ranking.getRanking().remove(indice);
+	      }else {
+	    	  indice++;
+	      }
+		  
+	  }
   }
 }
