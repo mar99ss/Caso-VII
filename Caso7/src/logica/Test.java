@@ -8,13 +8,13 @@ package logica;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Hashtable;
 
 /**
  *
  * @author Carlos Vega
  */
-public class Test {
-  private final String secretKeyPrin = "29dh120bdk133";
+public class Test { 
   private final String originalString = "xZwM7BWIpSjYyGFr9rhpEa+cYVtACW7yQKmyN6OYSCv0ZEg9jWbc6lKzzCxRSSIvOvlimQZBMZOYnOwiA9yy3YU8zk4abFSItoW6Wj0ufQ0=";
   private final String parte1= "29dh120";
   private final String parte2= "dk1";
@@ -23,8 +23,7 @@ public class Test {
   private final String[] numeros={"0","1","2","3","4","5","6","7","8","9"};
   private Ranking ranking;
   private ArrayList<String> arrayLetras;
-  private ArrayList<String> arrayNumeros;
-  
+  private ArrayList<String> arrayNumeros; 
   public Test(){ 
   }
   
@@ -39,11 +38,9 @@ public class Test {
   }
   
   public void crearRanking(){
-    ranking = new Ranking();
-     int cantidadConjuntos=(int) (Math.random() * 10);
+    ranking = new Ranking(); 
     for (int indice=0;indice<7;indice++){
-      Conjunto conjunto = new Conjunto();
-      
+      Conjunto conjunto = new Conjunto(); 
       for(int letra =0;letra<(Math.random()*26);letra++){
         int letraAleatorio= (int)(Math.random()*26);
         conjunto.getCaracteres().add(arrayLetras.get(letraAleatorio));
@@ -56,8 +53,8 @@ public class Test {
       
       ranking.getRanking().add(conjunto);
     }
-    calcularSucced();
-    ranking.getSortedRankingBysucced();
+    calcularSucced(); 
+    ranking.getSortedRankingBysucced(); 
   }
   
   public void calcularSucced(){
@@ -71,7 +68,7 @@ public class Test {
 	    	System.out.println("Letra: "+letras[letra]);
 	        System.out.println("Numero: "+numeros[numero]); 
 	        String decryptedString = AES.decrypt(originalString, secretKey) ;
-	        if(decryptedString!=null){
+	        if(decryptedString=="Lograste encontrar el secret key correcto para este AES, felicidades!"){
 	            System.out.println(originalString); 
 	            System.out.println(decryptedString);
 	            System.out.println(secretKey);  
@@ -95,8 +92,19 @@ public class Test {
      
   }
   
-  public ArrayList<Conjunto> conseguirRespuesta(){
-	  ArrayList<Conjunto> conjuntoFinal = new ArrayList<>();
-	  return conjuntoFinal;
+  public Conjunto conseguirRespuesta(){
+    ArrayList<Conjunto> arrayFinal = new ArrayList<>();
+    Conjunto conjuntoFin = new Conjunto();
+    for(int i =0;i<ranking.getRanking().size();i++ ){
+      if (ranking.getRanking().get(i).getSucced()>0.0) {
+    	  arrayFinal.add(ranking.getRanking().get(i));
+      }
+    }
+    for(int i =0;i<arrayFinal.get(0).getCaracteres().size();i++ ){
+        if (arrayFinal.get(0).getCaracteres().contains(arrayFinal.get(1).getCaracteres().get(i))) {
+        	conjuntoFin.getCaracteres().add(arrayFinal.get(1).getCaracteres().get(i));
+        }
+      }  
+    return conjuntoFin;
   }
 }

@@ -7,21 +7,21 @@ package logica;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 
 /**
  *
  * @author Carlos Vega
  */
 public class Ranking {
-  private ArrayList<Conjunto> ranking;
-
+  private ArrayList<Conjunto> ranking; 
   public Ranking() {
     ranking = new ArrayList<>();
   }
   
   
   public ArrayList<Conjunto> getSortedRankingBysucced() {         
-    Collections.sort(ranking, Conjunto.succedComparator);         
+    Collections.sort(ranking, Conjunto.succedComparator);     
     return ranking;     
   }     
 
